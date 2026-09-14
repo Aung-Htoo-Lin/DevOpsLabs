@@ -1,1 +1,1 @@
-![workflow](https://github.com/<UserName>/<RepositoryName>/actions/workflows/main.yml/badge.svg)
+![workflow](https://github.com/<AungHtooLin>/<DevOpsLabs>/actions/workflows/main.yml/badge.svg)
