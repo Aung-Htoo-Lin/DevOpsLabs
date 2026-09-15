@@ -12,19 +12,28 @@ jobs:
       - name: Set up JDK 26
         uses: actions/setup-java@v5
         with:
-          java-version: '26' # Changed from '17' to '26'
+          java-version: '26'
           distribution: 'temurin'
 
-      - name: Compile with Maven
-        run: mvn compile
+      - name: Setup network & MongoDB
+        run: |
+          docker network create --driver bridge se-methods
+          docker run -d --name mongo-dbserver --network se-methods mongo:latest
+          # Wait for MongoDB to become healthy before proceeding
+          echo "Waiting for MongoDB to start..."
+          until docker exec mongo-dbserver mongosh --eval "db.adminCommand('ping')" > /dev/null 2>&1; do
+            sleep 2
+          done
+          echo "MongoDB is ready!"
 
-      - name: Build Docker Image
-        run: docker build -t devopsimage .
+      - name: Build with Maven
+        run: mvn package
+
+      - name: Build Docker image
+        run: docker build -t se_methods .
 
       - name: Run image
-        run: docker run --name devopscontainer -d devopsimage
+        run: docker run --network se-methods --name devopscontainer se_methods
 
-      - name: view logs
-        run: |
-          sleep 3
-          docker logs devopscontainer
+      - name: View logs
+        run: docker logs devopscontainer
