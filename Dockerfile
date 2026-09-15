@@ -1,4 +1,4 @@
-FROM amazoncorretto:17
-COPY ./target/classes/com /tmp/com
+FROM eclipse-temurin:26-jdk
+COPY ./target/seMethods-1.0-SNAPSHOT-jar-with-dependencies.jar /tmp
 WORKDIR /tmp
-ENTRYPOINT ["java", "com.napier.sem.App"]
+ENTRYPOINT ["java", "-jar", "seMethods-1.0-SNAPSHOT-jar-with-dependencies.jar"]
