@@ -1,63 +1,43 @@
 package com.napier.devops;
 
-import java.sql.*;
-
 public class App
 {
+    /**
+     * Display an employee's details.
+     * @param emp The Employee object to print.
+     */
+    public void displayEmployee(Employee emp)
+    {
+        if (emp != null)
+        {
+            System.out.println(
+                    emp.emp_no + " "
+                            + emp.first_name + " "
+                            + emp.last_name + "\n"
+            );
+        }
+        else
+        {
+            System.out.println("No employee found.");
+        }
+    }
+
     public static void main(String[] args)
     {
-        try
-        {
-            // Load Database driver
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        }
-        catch (ClassNotFoundException e)
-        {
-            System.out.println("Could not load SQL driver");
-            System.exit(-1);
-        }
+        // Create new Application and DatabaseHandler instances
+        App a = new App();
+        DatabaseHandler db = new DatabaseHandler();
 
-        // Connection to the database
-        Connection con = null;
-        int retries = 100;
-        for (int i = 0; i < retries; ++i)
-        {
-            System.out.println("Connecting to database...");
-            try
-            {
-                // Wait a bit for db to start
-                // Lower sleep time to connect as soon as MySQL is ready
-                Thread.sleep(5000); // 5 seconds instead of 30000 ms
-                // Connect to database
-                con = DriverManager.getConnection("jdbc:mysql://db:3306/employees?allowPublicKeyRetrieval=true&useSSL=false", "root", "example");
-                System.out.println("Successfully connected");
-                // Wait a bit
-                Thread.sleep(10000);
-                // Exit for loop
-                break;
-            }
-            catch (SQLException sqle)
-            {
-                System.out.println("Failed to connect to database attempt " + Integer.toString(i));
-                System.out.println(sqle.getMessage());
-            }
-            catch (InterruptedException ie)
-            {
-                System.out.println("Thread interrupted? Should not happen.");
-            }
-        }
+        // Connect to database
+        db.connect();
 
-        if (con != null)
-        {
-            try
-            {
-                // Close connection
-                con.close();
-            }
-            catch (Exception e)
-            {
-                System.out.println("Error closing connection to database");
-            }
-        }
+        // Extract employee information
+        Employee emp = db.getEmployee(255530);
+
+        // Display results
+        a.displayEmployee(emp);
+
+        // Disconnect from database
+        db.disconnect();
     }
 }
