@@ -1,7 +1,7 @@
 package com.napier.devops;
 
 /**
- * Represents an employee
+ * Represents an employee.
  */
 public class Employee
 {
