@@ -155,6 +155,28 @@ public class App {
         }
     }
 
+    /**
+     * Prints a list of employees.
+     * @param employees The list of employees to print.
+     */
+    public void printSalaries(ArrayList<Employee> employees) {
+        if (employees == null) {
+            System.out.println("No employees to print.");
+            return;
+        }
+
+        // Print header
+        System.out.println(String.format("%-10s %-15s %-20s %-8s", "Emp No", "First Name", "Last Name", "Salary"));
+
+        // Loop over all employees in the list
+        for (Employee emp : employees) {
+            String emp_string =
+                    String.format("%-10s %-15s %-20s %-8s",
+                            emp.getEmp_no(), emp.getFirst_name(), emp.getLast_name(), emp.getSalary());
+            System.out.println(emp_string);
+        }
+    }
+
     public static void main(String[] args) {
         // Create new Application
         App a = new App();
@@ -165,10 +187,8 @@ public class App {
         // Extract employee salary information
         ArrayList<Employee> employees = a.getAllSalaries();
 
-        // Test the size of the returned data - should be 240124
-        if (employees != null) {
-            System.out.println(employees.size());
-        }
+        // Print list of salaries
+        a.printSalaries(employees);
 
         // Disconnect from database
         a.disconnect();
