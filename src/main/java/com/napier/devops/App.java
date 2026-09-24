@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 public class App {
 
@@ -61,14 +62,13 @@ public class App {
         }
     }
 
-    public Employee getEmployee(int ID)
-    {
-        try
-        {
-            // Create an SQL statement
+    /**
+     * Gets a single employee's details by ID.
+     */
+    public Employee getEmployee(int ID) {
+        try {
             Statement stmt = con.createStatement();
 
-            // Create SQL statement joining all related tables for active records (to_date = '9999-01-01')
             String strSelect =
                     "SELECT emp.emp_no, emp.first_name, emp.last_name, "
                             + "titles.title, salaries.salary, departments.dept_name, "
@@ -82,15 +82,11 @@ public class App {
                             + "LEFT JOIN employees mgr ON dept_manager.emp_no = mgr.emp_no "
                             + "WHERE emp.emp_no = " + ID;
 
-            // Execute SQL statement
             ResultSet rset = stmt.executeQuery(strSelect);
 
-            // Check if a record is returned and map to Employee object
-            if (rset.next())
-            {
+            if (rset.next()) {
                 Employee emp = new Employee();
 
-                // Using JavaBean setters (or direct field assignments if public):
                 emp.setEmp_no(rset.getInt("emp_no"));
                 emp.setFirst_name(rset.getString("first_name"));
                 emp.setLast_name(rset.getString("last_name"));
@@ -100,12 +96,10 @@ public class App {
                 emp.setManager(rset.getString("manager"));
 
                 return emp;
-            }
-            else
+            } else {
                 return null;
-        }
-        catch (Exception e)
-        {
+            }
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             System.out.println("Failed to get employee details");
             return null;
@@ -128,6 +122,39 @@ public class App {
         }
     }
 
+    /**
+     * Gets all the current employees and salaries.
+     * @return A list of all employees and salaries, or null if there is an error.
+     */
+    public ArrayList<Employee> getAllSalaries() {
+        try {
+            Statement stmt = con.createStatement();
+
+            String strSelect =
+                    "SELECT employees.emp_no, employees.first_name, employees.last_name, salaries.salary "
+                            + "FROM employees, salaries "
+                            + "WHERE employees.emp_no = salaries.emp_no AND salaries.to_date = '9999-01-01' "
+                            + "ORDER BY employees.emp_no ASC";
+
+            ResultSet rset = stmt.executeQuery(strSelect);
+
+            ArrayList<Employee> employees = new ArrayList<Employee>();
+            while (rset.next()) {
+                Employee emp = new Employee();
+                emp.setEmp_no(rset.getInt("employees.emp_no"));
+                emp.setFirst_name(rset.getString("employees.first_name"));
+                emp.setLast_name(rset.getString("employees.last_name"));
+                emp.setSalary(rset.getInt("salaries.salary"));
+                employees.add(emp);
+            }
+            return employees;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println("Failed to get salary details");
+            return null;
+        }
+    }
+
     public static void main(String[] args) {
         // Create new Application
         App a = new App();
@@ -135,11 +162,13 @@ public class App {
         // Connect to database
         a.connect();
 
-        // Get Employee
-        Employee emp = a.getEmployee(255530);
+        // Extract employee salary information
+        ArrayList<Employee> employees = a.getAllSalaries();
 
-        // Display results
-        a.displayEmployee(emp);
+        // Test the size of the returned data - should be 240124
+        if (employees != null) {
+            System.out.println(employees.size());
+        }
 
         // Disconnect from database
         a.disconnect();
