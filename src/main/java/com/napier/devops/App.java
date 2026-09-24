@@ -61,14 +61,14 @@ public class App {
         }
     }
 
-    /**
-     * Retrieve complete details for a given employee ID.
-     */
-    public Employee getEmployee(int ID) {
-        try {
+    public Employee getEmployee(int ID)
+    {
+        try
+        {
+            // Create an SQL statement
             Statement stmt = con.createStatement();
 
-            // SQL query joining all employee-related tables for current records (to_date = '9999-01-01')
+            // Create SQL statement joining all related tables for active records (to_date = '9999-01-01')
             String strSelect =
                     "SELECT emp.emp_no, emp.first_name, emp.last_name, "
                             + "titles.title, salaries.salary, departments.dept_name, "
@@ -82,10 +82,15 @@ public class App {
                             + "LEFT JOIN employees mgr ON dept_manager.emp_no = mgr.emp_no "
                             + "WHERE emp.emp_no = " + ID;
 
+            // Execute SQL statement
             ResultSet rset = stmt.executeQuery(strSelect);
 
-            if (rset.next()) {
+            // Check if a record is returned and map to Employee object
+            if (rset.next())
+            {
                 Employee emp = new Employee();
+
+                // Using JavaBean setters (or direct field assignments if public):
                 emp.setEmp_no(rset.getInt("emp_no"));
                 emp.setFirst_name(rset.getString("first_name"));
                 emp.setLast_name(rset.getString("last_name"));
@@ -93,11 +98,14 @@ public class App {
                 emp.setSalary(rset.getInt("salary"));
                 emp.setDept_name(rset.getString("dept_name"));
                 emp.setManager(rset.getString("manager"));
+
                 return emp;
-            } else {
-                return null;
             }
-        } catch (Exception e) {
+            else
+                return null;
+        }
+        catch (Exception e)
+        {
             System.out.println(e.getMessage());
             System.out.println("Failed to get employee details");
             return null;
